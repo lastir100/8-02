@@ -33,7 +33,26 @@
 
 ![Config](./img/2_2.jpg)`
 
-
+```
+pipeline {
+ agent any
+ stages {
+  stage('Git') {
+   steps {git branch: 'main', url: 'https://github.com/lastir100/sdvps-materials.git'}
+  }
+  stage('Test') {
+   steps {
+    sh '/usr/local/go/bin/go test .'
+   }
+  }
+  stage('Build') {
+   steps {
+    sh 'docker build . -t ubuntu-bionic:8082/hello-world:v$BUILD_NUMBER'
+   }
+  }
+ }
+}
+```
 ---
 
 ### Задание 3
@@ -48,6 +67,35 @@
 В качестве ответа пришлите скриншоты с настройками проекта и результатами выполнения сборки.
 
 ### Решение 3
+![Result](./img/3_1.jpg)`
+
+![Config](./img/3_2.jpg)`
+
+```
+pipeline {
+ agent any
+ stages {
+  stage('Git') {
+   steps {git branch: 'main', url: 'https://github.com/lastir100/sdvps-materials.git'}
+  }
+  stage('Test') {
+   steps {
+    sh '/usr/local/go/bin/go test .'
+   }
+  }
+  stage('Build') {
+   steps {
+    sh 'CGO_ENABLED=0 GOOS=linux /usr/local/go/bin/go build -a -installsuffix nocgo -o ~/app .'
+   }
+  }
+  stage('Push') {
+   steps {
+    sh 'curl -u admin:admin http://192.168.1.80:8081/repository/lab/ --upload-file ~/app'   }
+  }
+ }
+}
+```
+
 ---
 ## Дополнительные задания* (со звёздочкой)
 
